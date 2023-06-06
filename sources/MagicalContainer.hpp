@@ -35,12 +35,12 @@ namespace ariel{
 
             int position;
             int index_order;
-            MagicalContainer* my_container;
+            MagicalContainer* container;
             char type;
 
         public:
 
-            Iterator(MagicalContainer& my_cntainer);
+            Iterator(MagicalContainer& _container);
             Iterator();
             Iterator(const Iterator& other);
             ~Iterator();
@@ -61,7 +61,7 @@ namespace ariel{
 
         public:
             AscendingIterator();
-            AscendingIterator(MagicalContainer& my_container);
+            AscendingIterator(MagicalContainer& _container);
             AscendingIterator(const AscendingIterator& other);
             ~AscendingIterator();
 
@@ -79,7 +79,7 @@ namespace ariel{
         
         public:
             SideCrossIterator();
-            SideCrossIterator(MagicalContainer& my_container);
+            SideCrossIterator(MagicalContainer& _container);
             SideCrossIterator(const SideCrossIterator& other);
             ~SideCrossIterator();
             
@@ -93,7 +93,7 @@ namespace ariel{
 
         public:
             PrimeIterator();
-            PrimeIterator(MagicalContainer& my_container);
+            PrimeIterator(MagicalContainer& _container);
             PrimeIterator(const PrimeIterator& other);
             ~PrimeIterator();
              int operator*() const override;
