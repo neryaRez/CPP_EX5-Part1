@@ -7,12 +7,13 @@ namespace ariel{
     MagicalContainer::MagicalContainer(){}
     MagicalContainer::~MagicalContainer(){}
 
+
     void MagicalContainer::addElement(int element) {
 
-        auto it = lower_bound(data.begin(), data.end(), element);
+        auto it = lower_bound(data.begin(), data.end(), element); //Uses binary search to find the proper place to insert. 
         if (it != data.end() && *it == element) return; // If element already exists in the vector, no need to insert.  
         data.insert(it, element);  // Insert at the position determined by lower_bound.
-        update_primes();
+        update_primes(); // updating the addresses list of the prime numbers.
     }
 
     void MagicalContainer::update_primes(){
@@ -26,17 +27,17 @@ namespace ariel{
 
     void MagicalContainer::removeElement(int element){
 
-        auto it = lower_bound(data.begin(), data.end(), element);
+        auto it = lower_bound(data.begin(), data.end(), element); // Uses binary search to find the element.
         if(it == data.end() || *it != element) throw runtime_error("Element not found. can not be removed\n");  
         data.erase(it);
-        update_primes();  
+        update_primes();  //delete and update the pointers list
     }
 
     int MagicalContainer::size(){
-        return this->data.size();
+        return this->data.size(); // returns the size of the general data structure to all of the elements.
     }
 
-    bool MagicalContainer::is_prime(int element){
+    bool MagicalContainer::is_prime(int element){ //checks if number is prime
 
         if(element < 2) return false;
         int sqr = sqrt(element);
@@ -107,8 +108,7 @@ namespace ariel{
 
     MagicalContainer::AscendingIterator::~AscendingIterator(){}
 
-
-
+    //assignment operator
     MagicalContainer::AscendingIterator& MagicalContainer::AscendingIterator::operator=(const AscendingIterator& other){
         
         if (this->container != other.container ) 
@@ -116,7 +116,7 @@ namespace ariel{
         this->index_order = other.index_order;
         return *this;
     }
-
+    //dereference operator 
     int MagicalContainer::AscendingIterator::operator*() const {
 
         if(index_order == container->size())
@@ -125,22 +125,22 @@ namespace ariel{
         return container->data[static_cast<size_t> (index_order)];
 
     }
-
+    //incerases the iterator by its logical order.
     MagicalContainer::AscendingIterator& MagicalContainer::AscendingIterator::operator++() {
 
         if( *this == this->end()) throw runtime_error("End should not be incremented\n");
         this->index_order++;
         return *this;
-
     }
+    // returns the start_point of the iterator
     MagicalContainer::AscendingIterator MagicalContainer::AscendingIterator::begin(){
 
         AscendingIterator beg;
         beg.container = this->container;
         beg.index_order = 0;
         return beg;
-        
     }
+    // returns the end_point of the iterator
     MagicalContainer::AscendingIterator MagicalContainer::AscendingIterator::end(){
        
         AscendingIterator en;
@@ -203,6 +203,7 @@ namespace ariel{
         this->index_order++;
         return *this;
     }
+
     MagicalContainer::SideCrossIterator MagicalContainer::SideCrossIterator::begin(){
 
         SideCrossIterator beg;
@@ -213,6 +214,7 @@ namespace ariel{
 
         return beg;
     }
+    
     MagicalContainer::SideCrossIterator MagicalContainer::SideCrossIterator::end(){
 
         SideCrossIterator en;
@@ -254,7 +256,6 @@ namespace ariel{
         return *this;
     }
 
-
     int MagicalContainer::PrimeIterator::operator*() const{
 
         if(index_order == container->primes.size())
@@ -262,6 +263,7 @@ namespace ariel{
 
         return *(container->primes[static_cast<size_t> (index_order)]);
     }
+
     MagicalContainer::PrimeIterator MagicalContainer::PrimeIterator::begin(){
 
         PrimeIterator beg;
@@ -269,6 +271,7 @@ namespace ariel{
         beg.index_order = 0;
         return beg;
     }
+
     MagicalContainer::PrimeIterator MagicalContainer::PrimeIterator::end(){
         
         PrimeIterator en;
