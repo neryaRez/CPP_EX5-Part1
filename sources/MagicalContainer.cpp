@@ -50,28 +50,16 @@ namespace ariel{
 
     MagicalContainer::Iterator::Iterator( MagicalContainer& _container) : container(&_container) {
         this->index_order =0;
-        this->position =0;
     }
 
     MagicalContainer::Iterator::Iterator(const Iterator& other): container(other.container) {
         this->index_order = other.index_order;
-        this->position = other.position;
         this->type = other.type;
     }
 
     MagicalContainer::Iterator::Iterator(): container(nullptr){}
 
     MagicalContainer::Iterator::~Iterator() {}
-
-    MagicalContainer::Iterator& MagicalContainer::Iterator::operator=(const Iterator& other) {
-
-        if(this->container != other.container || this->type != other.type)
-            throw runtime_error("Iterator can not be initialized to operator of different container/type \n");
-        
-        this->index_order = other.index_order;
-        this->position = other.position;
-        return *this;
-    }
 
     bool MagicalContainer::Iterator::operator==(const Iterator& other) const {
 
@@ -105,22 +93,6 @@ namespace ariel{
         return this->index_order > other.index_order;
     }
 
-    int MagicalContainer::Iterator::operator*() const {
-
-        if(this->index_order == this->container->size())
-            throw runtime_error("End should not be dereferenced\n");
-
-        return this->container->data[static_cast<size_t> (position)];
-    }
-
-    int MagicalContainer::Iterator::get_position() {
-        return position;
-    }
-
-    int MagicalContainer::Iterator::get_index_order() {
-        return this->index_order;
-    }
-
     // AscendingIterator
 
     MagicalContainer::AscendingIterator::AscendingIterator() :Iterator(){
@@ -135,19 +107,37 @@ namespace ariel{
 
     MagicalContainer::AscendingIterator::~AscendingIterator(){}
 
+
+
+    MagicalContainer::AscendingIterator& MagicalContainer::AscendingIterator::operator=(const AscendingIterator& other){
+        
+        if (this->container != other.container ) 
+        throw runtime_error("Iterator can not be initialized to operator of different container\n"); 
+        this->index_order = other.index_order;
+        return *this;
+    }
+
+    int MagicalContainer::AscendingIterator::operator*() const {
+
+        if(index_order == container->size())
+            throw runtime_error("End should not be dereferenced\n");
+
+        return container->data[static_cast<size_t> (index_order)];
+
+    }
+
     MagicalContainer::AscendingIterator& MagicalContainer::AscendingIterator::operator++() {
 
         if( *this == this->end()) throw runtime_error("End should not be incremented\n");
         this->index_order++;
-        this->position++;
         return *this;
+
     }
     MagicalContainer::AscendingIterator MagicalContainer::AscendingIterator::begin(){
 
         AscendingIterator beg;
         beg.container = this->container;
         beg.index_order = 0;
-        beg.position = 0;
         return beg;
         
     }
@@ -156,12 +146,11 @@ namespace ariel{
         AscendingIterator en;
         en.container = this->container;
         en.index_order = this->container->data.size();
-        en.position = this->container->data.size();
         return en;
 
     }
 
-    // SideCrossIterator
+    //SideCrossIterator
 
     MagicalContainer::SideCrossIterator::SideCrossIterator(): Iterator(){
         this->type = 's';
@@ -169,7 +158,7 @@ namespace ariel{
 
     MagicalContainer::SideCrossIterator::SideCrossIterator(MagicalContainer& container) : Iterator(container) {
         this->type = 's';
-        this->start_index = 1;
+        this->start_index = 0;
         this->end_index = this->container->size()-1;
     }
 
@@ -180,20 +169,37 @@ namespace ariel{
 
     MagicalContainer::SideCrossIterator::~SideCrossIterator() {}
 
+    MagicalContainer::SideCrossIterator& MagicalContainer::SideCrossIterator::operator=(const SideCrossIterator& other){
+        if (this->container != other.container ) 
+        throw runtime_error("Iterator can not be initialized to operator of different container\n"); 
+        
+        this->index_order = other.index_order;
+        this->end_index = other.end_index;
+        this->start_index = other.start_index;
+
+        return *this;
+    }
+
+    int MagicalContainer::SideCrossIterator::operator*() const{
+
+        if(index_order == container->size())
+            throw runtime_error("End should not be dereferenced\n");
+
+        if(index_order%2 ==0) return container->data[static_cast<size_t> (start_index)];
+
+        else return container->data[static_cast<size_t> (end_index)];
+
+    }
+    
+
     MagicalContainer::SideCrossIterator& MagicalContainer::SideCrossIterator::operator++() {
 
         if( *this == this->end()) throw runtime_error("End should not be incremented\n");
     
-        if(index_order%2 ==0)
-        {
-                this->position = end_index;
-                end_index --;
-        }
-        else
-        {
-            this->position = start_index;
-            start_index++;
-        }
+        if(index_order%2 ==0) start_index++;
+       
+        else end_index--;
+       
         this->index_order++;
         return *this;
     }
@@ -202,8 +208,7 @@ namespace ariel{
         SideCrossIterator beg;
         beg.container = this->container;
         beg.index_order = 0;
-        beg.position = 0;
-        beg.start_index = 1;
+        beg.start_index = 0;
         beg.end_index = this->container->size()-1;
 
         return beg;
@@ -213,14 +218,13 @@ namespace ariel{
         SideCrossIterator en;
         en.container = this->container;
         en.index_order = this->container->size();
-        en.position = (container->size() / 2) + 1;
-        en.start_index = en.position-1;
-        en.end_index = en.position-1;
+        en.start_index = (container->size() / 2);
+        en.end_index = (container->size() / 2);
 
         return en;
     }
 
-    // PrimeIterator
+    //PrimeIterator
 
     MagicalContainer::PrimeIterator::PrimeIterator():Iterator() {
         this->type = 'p';
@@ -234,28 +238,35 @@ namespace ariel{
 
     MagicalContainer::PrimeIterator::~PrimeIterator() {}
 
+    MagicalContainer::PrimeIterator& MagicalContainer::PrimeIterator::operator=(const PrimeIterator& other){
+
+        if (this->container != other.container ) 
+        throw runtime_error("Iterator can not be initialized to operator of different container\n"); 
+        this->index_order = other.index_order;
+        return *this;
+        
+    }
+
     MagicalContainer::PrimeIterator& MagicalContainer::PrimeIterator::operator++() {
 
         if( *this == this->end()) throw runtime_error("End should not be incremented\n");
-
         this->index_order++;
-        this->position++;
         return *this;
-
     }
+
+
     int MagicalContainer::PrimeIterator::operator*() const{
 
-        if(this->index_order == this->container->primes.size())
+        if(index_order == container->primes.size())
             throw runtime_error("End should not be dereferenced\n");
 
-        return *(this->container->primes[static_cast<size_t> (position)]);
+        return *(container->primes[static_cast<size_t> (index_order)]);
     }
     MagicalContainer::PrimeIterator MagicalContainer::PrimeIterator::begin(){
 
         PrimeIterator beg;
         beg.container = this->container;
         beg.index_order = 0;
-        beg.position = 0;
         return beg;
     }
     MagicalContainer::PrimeIterator MagicalContainer::PrimeIterator::end(){
@@ -263,8 +274,6 @@ namespace ariel{
         PrimeIterator en;
         en.container = this->container;
         en.index_order = container->primes.size();
-        en.position = container->primes.size();
-
         return en;
     }
 }
