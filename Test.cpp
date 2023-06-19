@@ -160,14 +160,11 @@ TEST_SUITE("Ascending Iterator"){
         MagicalContainer f;
         vector<int> vec_f = {1,2,3,4,5,6,7,8,9,10};
 
-        for (size_t i = 0; i < 10; i++)
-        {
-            f.addElement(vec_f[i]);
-        }
+        for (size_t i = 0; i < 10; i++) f.addElement(vec_f[i]);
 
         MagicalContainer::AscendingIterator it(f), it2(f), it3(f), it4(f), it5(f);
 
-        it = it.begin(), it2 = it.begin(), it3 = it.begin(), it4 = it.begin(), it5 = it.end();
+        it5 = it.end();
 
         ++it2;
 
@@ -181,8 +178,6 @@ TEST_SUITE("Ascending Iterator"){
         CHECK(((it5 > it4)&&(it5 > it3)&&(it5 > it2) &&(it5 > it)));
 
         MagicalContainer::AscendingIterator it6(f);
-
-        it6 = it.begin();
         ++it6;
 
         CHECK(it6 == it2);
@@ -197,5 +192,247 @@ TEST_SUITE("Ascending Iterator"){
 
     }
 
+    TEST_CASE("Change the Container During the Iterator"){
+
+        MagicalContainer a;
+        vector<int> vec_a = {1,3,5,7,9,11,13,15,17,19};
+
+        for (size_t i = 0; i < vec_a.size(); i++) a.addElement(vec_a[i]);
+
+        MagicalContainer::AscendingIterator it(a);
+
+        ++it;
+
+        ++it;
+
+        ++it;
+
+        a.removeElement(15);
+        a.removeElement(17);
+
+        for (; it !=it.end(); ++it)
+        {
+            CHECK_NE(*it, 15);
+            CHECK_NE(*it, 17);
+        }
+
+
+    }
+
 
 }
+
+TEST_SUITE("Side Cross Iterator"){
+
+    MagicalContainer g;
+
+    TEST_CASE("Dereference and ++ operators"){
+
+        vector<int> vec_g = {1,2,3,4,5,6,7,8,9,10};
+
+        for (size_t i = 0; i < 10; i++) g.addElement(vec_g[i]);
+
+        MagicalContainer::SideCrossIterator side(g);
+
+        vector<int> sorted_side = {1,10,2,9,3,8,4,7,5,6};
+
+        for (size_t i = 0; i < g.size(); i++)
+        {
+            CHECK_EQ(sorted_side[i],*side);
+            ++side;
+        }
+        CHECK_THROWS(++side); // end should not be incremented
+
+    }
+
+    TEST_CASE("Begin and End"){
+
+        MagicalContainer::SideCrossIterator  it(g);
+
+        it = it.begin();
+
+        CHECK_EQ(*it, 1);
+
+        it = it.end();
+
+        CHECK_THROWS(*it); // end should not be dreferenced
+    }
+
+    TEST_CASE("Assignment operator"){
+
+        MagicalContainer::SideCrossIterator it(g);
+
+        it = ++it;
+        CHECK_EQ(*it , 10);
+
+        MagicalContainer::SideCrossIterator it2(g);
+
+        ++ ( ++ (++it2));
+
+        it = it2; 
+
+        CHECK_EQ(*it, *it2);
+
+        MagicalContainer d;
+        MagicalContainer::SideCrossIterator it3(d);
+        CHECK_THROWS(it3 = it);
+        CHECK_NOTHROW(it2 = it);
+
+    }
+
+    TEST_CASE("Comparison Operators"){
+        MagicalContainer::SideCrossIterator it(g), it2(g), it3(g), it4(g);
+
+        CHECK(((it == it2)&&(it2 ==it3)&&(it3 ==it4)));
+
+        CHECK_FALSE(((it != it2)&&(it2 != it3)&&(it3 != it4)));
+
+        ++it2, ++(++it3), ++(++(++it4));
+
+        CHECK(((it2 > it)&&(it2 < it3) &&(it4 > it3)));
+        
+        CHECK_FALSE(((it2 < it)&&(it > it3)&&(it4 <it2)));
+
+        MagicalContainer h;
+
+        MagicalContainer::SideCrossIterator it5(h);
+
+        CHECK_THROWS(it5 = it2);
+        CHECK_THROWS(it5 = it2);
+
+
+    }
+
+        TEST_CASE("Change the Container During the Iterator"){
+
+        MagicalContainer a;
+        vector<int> vec_a = {1,3,5,7,9,11,13,15,17,19};
+
+        for (size_t i = 0; i < vec_a.size(); i++) a.addElement(vec_a[i]);
+
+        MagicalContainer::SideCrossIterator it(a);
+
+         ++it;
+
+        a.removeElement(15);
+        a.removeElement(17);
+
+        for (; it !=it.end(); ++it)
+        {
+            CHECK_NE(*it, 15);
+            CHECK_NE(*it, 17);
+        }
+
+
+    }
+
+}
+
+TEST_SUITE("Prime Iterator"){
+
+    MagicalContainer p;
+
+    TEST_CASE("Dereference and ++ operators"){
+
+        vector<int> vec_p = {1,2,3,4,5,6,7,8,9,10};
+
+        for (size_t i = 0; i < 10; i++) p.addElement(vec_p[i]);
+
+        MagicalContainer::PrimeIterator prime_it(p);
+
+        vector<int> primes = {2,3,5,7};
+
+        for (size_t i = 0; i < primes.size(); i++)
+        {
+            CHECK_EQ(primes[i],*prime_it);
+            ++prime_it;
+        }
+
+        CHECK_THROWS(++prime_it); // end should not be incremented
+
+    }
+
+    TEST_CASE("Begin and End"){
+
+        MagicalContainer::PrimeIterator it(p);
+
+        it = it.begin();
+
+        CHECK_EQ(*it, 2);
+
+        it = it.end();
+
+        CHECK_THROWS(*it); // end should not be dreferenced
+    }
+
+    TEST_CASE("Assignment operator"){
+
+        MagicalContainer::PrimeIterator it(p);
+
+        it = ++it;
+        CHECK_EQ(*it , 3);
+
+        MagicalContainer::PrimeIterator it2(p);
+
+        ++ ( ++ (it2));
+
+        it = it2; 
+
+        CHECK_EQ(*it, *it2);
+
+        MagicalContainer d;
+        MagicalContainer::PrimeIterator it3(d);
+        CHECK_THROWS(it3 = it);
+        CHECK_NOTHROW(it2 = it);
+
+    }
+
+    TEST_CASE("Comparison Operators"){
+        MagicalContainer::PrimeIterator it(p), it2(p), it3(p), it4(p);
+
+        CHECK(((it == it2)&&(it2 ==it3)&&(it3 ==it4)));
+
+        CHECK_FALSE(((it != it2)&&(it2 != it3)&&(it3 != it4)));
+
+        ++it2, ++(++it3), ++(++(++it4));
+
+        CHECK(((it2 > it)&&(it2 < it3) &&(it4 > it3)));
+        
+        CHECK_FALSE(((it2 < it)&&(it > it3)&&(it4 <it2)));
+
+        MagicalContainer h;
+
+        MagicalContainer::PrimeIterator it5(h);
+
+        CHECK_THROWS(it5 = it2);
+        CHECK_THROWS(it5 = it2);
+
+
+    }
+
+        TEST_CASE("Change the Container During the Iterator"){
+
+        MagicalContainer a;
+        vector<int> vec_a = {1,3,5,7,9,11,13,15,17,19};
+
+        for (size_t i = 0; i < vec_a.size(); i++) a.addElement(vec_a[i]);
+
+        MagicalContainer::SideCrossIterator it(a);
+
+        ++it;
+
+        a.removeElement(13);
+        a.removeElement(17);
+
+        for (; it !=it.end(); ++it)
+        {
+            CHECK_NE(*it, 13);
+            CHECK_NE(*it, 17);
+        }
+
+
+    }
+
+}
+
+
